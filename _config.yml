@@ -2,12 +2,12 @@
 #      Main Configs       #
 # ----------------------- #
 
-url: http://yoursite.com
-title: My Octopress Blog
-subtitle: A blogging framework for hackers.
-author: Your Name
+url: http://steverob.github.io
+title: "Steve Robinson"
+subtitle: "My life, code & random musings..."
+author: Steve Robinson
 simple_search: https://www.google.com/search
-description:
+description: A place to record all the interesting and not so interesting experiences in my life! You might find this useful or maybe you're just wasting your time :)
 
 # Default date format is "ordinal" (resulting in "July 22nd 2007")
 # You can customize the format as defined in
@@ -19,7 +19,7 @@ date_format: "ordinal"
 subscribe_rss: /atom.xml
 subscribe_email:
 # RSS feeds can list your email address if you like
-email:
+email: steve.rob@me.com
 
 # ----------------------- #
 #    Jekyll & Plugins     #
@@ -70,7 +70,7 @@ github_show_profile_link: true
 github_skip_forks: true
 
 # Twitter
-twitter_user:
+twitter_user: stev4nity
 twitter_tweet_button: true
 
 # Google +1
