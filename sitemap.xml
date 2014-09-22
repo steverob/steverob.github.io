@@ -3,6 +3,12 @@
   
   
   <url>
+    <loc>http://steverob.github.io/blog/2014/09/23/on-foundations-validation-and-my-pull-request/</loc>
+    <lastmod>2014-09-23T02:51:42+05:30</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
     <loc>http://steverob.github.io/blog/2014/08/10/a-fresh-start/</loc>
     <lastmod>2014-08-10T11:04:08+05:30</lastmod>
     <priority>0.8</priority>
@@ -10,17 +16,17 @@
   
   
   <url>
-    <loc>http://steverob.github.io/blog/archives/</loc>
-    <lastmod>2014-08-10T14:44:24+05:30</lastmod>
+    <loc>http://steverob.github.io/</loc>
+    <lastmod>2014-09-23T03:00:31+05:30</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
+    <priority>1.0</priority>
   </url>
   
   <url>
-    <loc>http://steverob.github.io/</loc>
-    <lastmod>2014-08-10T14:44:24+05:30</lastmod>
+    <loc>http://steverob.github.io/blog/archives/</loc>
+    <lastmod>2014-09-23T03:00:31+05:30</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
+    <priority>0.7</priority>
   </url>
   
   
