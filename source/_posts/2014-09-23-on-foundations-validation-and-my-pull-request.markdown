@@ -3,7 +3,7 @@ layout: post
 title: "On Foundation's validation &amp; my Pull Request"
 date: 2014-09-23 02:51:42 +0530
 comments: true
-categories: 
+categories: JavaScript, OpenSource
 ---
 
 We widely use the amazing [Zurb Foundation](http://foundation.zurb.com/) framework as a base for many of our projects at work. Foundation provides a lot of features and utilities out of the box. One such useful feature is the JavaScript form validation library which they call [Abide](http://foundation.zurb.com/docs/components/abide.html).
@@ -30,3 +30,8 @@ It's been a really long while since I last contributed something to an open sour
 Coding this feature was pretty straightforward since I just had follow the existing patterns in the library to add this new option which I named 'validate_on_blur'. Once I implemented the feature I updated the docs so this new option is reflected there and ran the Jasmine tests with Karma to make sure nothing broke. I then kinda felt compelled to write a spec for the new option and so I wrote a spec and made sure it passed.
 
 I've sent a [pull request](https://github.com/zurb/foundation/pull/5774) on GitHub with this code and I'm waiting for the maintainers to merge it in. I will update this post once I get a response. I strongly feel this is one of the best ways for people to contribute to their favorite open source projects and I am happy to have been able to make this contribution. Thanks to our client who requested this feature in the first place ;)
+
+Update - 31 Oct. 2014:
+
+My pull request has been merged and the guys at Foundation have promised to send me Yeti stickers! :) And my colleagues at Spritle surprised me with a new initiative where if any of our Open Source PRs get merged the company will get everyone ice cream on that day and today I became the "Ice create _contributor_ of the day" :D
+
