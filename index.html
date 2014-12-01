@@ -71,7 +71,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2014/11/30/your-own-geocoding-service/">Your Own Geocoding Service</a></h1>
+      <h1 class="entry-title"><a href="/blog/2014/11/30/your-own-geocoding-service/">Hosting FreeGeoIP in Your Cloud</a></h1>
     
     
       <p class="meta">
@@ -94,7 +94,7 @@
   </header>
 
 
-  <div class="entry-content"><p>In the project I&rsquo;m working on where we sell photos, we had to find out the country of each and every visitor for a certain business purpose. So we have this piece of code in the Rails ApplicationController to do the job.</p>
+  <div class="entry-content"><p>In the project I&rsquo;m working on where we sell photos, we had to find out the country of each and every visitor for a certain business purpose. So we have this piece of code in the Rails <code>ApplicationController</code> to do the job.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -115,347 +115,14 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>The <code>location</code> method called on <code>request</code> is actually provided by this super awesome and popular Geocoding gem called <a href="https://github.com/alexreisner/geocoder">geocoder</a> and it returns the country from which the request originated. It figures this information out using the IP address available in the request object. Okay but how does the geocoder gem finds the country from an IP address? For doing that geocoder actually talks to an external service called <a href="freegeoip.net">FreeGeoIP</a> which is an app written in Go-lang. Btw, Geocoder supports many more such services such as the ones provided by Google, MaxMind etc. FreeGeoIP is completely free and has a fairly reasonable rate-limit (10000 requests / hr). We deployed this part to production and it was working fine until I noticed some performance issues within couple of days.</p>
+<p>The <code>location</code> method called on <code>request</code> is actually provided by this super awesome and popular Geocoding gem called <a href="https://github.com/alexreisner/geocoder">geocoder</a> and it returns the country from which the request originated. It figures this information out using the IP address available in the request object. Okay but how does the geocoder gem finds the country from an IP address? For doing that geocoder actually talks to an external service called <a href="http://freegeoip.net">FreeGeoIP</a> which is a service written in Go-lang. Btw, Geocoder supports many more such geocoding services like the ones provided by Google, MaxMind etc. FreeGeoIP is completely free and has a fairly reasonable rate-limit (10000 requests / hr). We deployed this part to production and it was working fine until I noticed some performance issues within couple of days.</p>
 
-<p>As most of you might have guessed making a request to an external service can be a pretty costly affair and can ruin the response times of your app if you are using it in a crucial place like how we use in our app. The worst part is that whenever a new user visits our site for the first time they are forced to go through this process and consequently the inital page load took too long. Below is the breakdown table for our landing page&rsquo;s controller action provided by NewRelic. As you can see this request to freegeoip.net is slowing things down a lot.</p>
-
-<p><img src="http://i.imgur.com/MwAoGBc.png"></p>
-
-<p>The good thing about FreeGeoIP is the fact that its an <a href="https://github.com/fiorix/freegeoip">OpenSource</a> app and can be hosted by anyone anywere. Since our app is on Amazon AWS, a simple fix to this latency issue would be to host FreeGeoIP inside our cloud so that the latency becomes almost negligible. But I never had the urgency to do this as we had other tasks which I felt were more important on our plate and postponed this task to be done at the end of the week.</p>
-
-<p>But then before the week could end disaster struck. I woke up and found a string of emails on my phone alerting me about the error rate being too high on the app. I logged onto Rollbar (a service we use for exception tracking) and found the exception - <code>Errno::ECONNREFUSED: Connection refused - connect(2)</code> thrown everywhere we used the geocoding service. I initially thought that we might have hit the rate limit or something but just to make sure I tried visiting freegeoip.net and found that the site was unreachable. That was it. This was the worst case scenario that could have happened and it happened and I had to take some action.</p>
-
-<p><img src="http://i.imgur.com/stSG9rp.png"></p>
-
-<p>At first I tried switching to MaxMind as a geocoding service but the format in which the results were sent back was different from that received from FreeGeoIP and I would have to make some changes in my app to accomodate this and I did not feel right about that. So the only choice that remained was to host FreeGeoIP on our own in our cloud.</p>
-
-<p>Sounds simple enough. But the problem was that FreeGeoIP is a Go app and I&rsquo;ve never worked with a Go project before. The documentation was also not straightforward. But in the end I managed to find my way through with some help from the steps inside a Dockerfile in the repo :)</p>
-
-<p>So here&rsquo;s how you build the FreeGeoIP project (or any Go project).</p>
-
-<h4>1. Install Go</h4>
-
-<p>For Debian based Linux systems installing is pretty straightforward. All you need to do this,</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>sudo apt-get install python-software-properties  <span class="c"># 12.04</span>
-</span><span class='line'><span class="nv">$ </span>sudo add-apt-repository ppa:duh/golang
-</span><span class='line'><span class="nv">$ </span>sudo apt-get update
-</span><span class='line'><span class="nv">$ </span>sudo apt-get install golang
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><a href="http://railskey.wordpress.com/2014/05/31/install-gogolang-on-ubuntu/">Pravin Mishra</a> has written a nice blog detailing all this. Also you can find more instructions in the official <a href="http://golang.org/doc/install">Go-lang website</a>.</p>
-
-<p>Once done you need to setup two environment variables. One is <code>GOROOT</code> which points to the Go installation (<code>/usr/lib/go</code>) if you used above commands to install. The other is the <code>GOBIN</code> variable which points to the directory where you want to keep the binary files generated after building your Go projects. (say <code>/usr/bin/g</code>).</p>
-
-<p>Once done type <code>go version</code> on your terminal to confirm the installation.</p>
-
-<h4>2. Setup your workspace</h4>
-
-<p>Go requires your project directory to be setup in a certain way. So lets get that setup.</p>
-
-<p>First lets create a root directory for our Go projects.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>mkdir ~/go-lang
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Now under this directory you need to have this directory called <code>src</code> which will contain the Go source files. It is important that your source files are stored under a directory hierarchy thast follows the source control repository URLs of the Go projects.</p>
-
-<p>For instance the FreeGeoIP project&rsquo;s source code needs to be under the directory - <code>~/go-lang/src/github.com/fiorix/freegeoip</code>. This way projects are automatically namespaced. Pretty neat. Let&rsquo;s go ahead and set this up.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>mkdir -p ~/go-lang/src/github.com/fiorix/freegeoip
-</span><span class='line'><span class="nv">$ </span><span class="nb">cd</span> ~/go-lang/src/github.com/fiorix/freegeoip
-</span><span class='line'><span class="nv">$ </span>git clone https://github.com/fiorix/freegeoip.git .
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>
-Now we&rsquo;ve got the workspace setup with the source code of the FreeGeoIP app. Let&rsquo;s build it.</p>
-
-<h4>3. Build the app</h4>
-
-<p>The source code for the web service is under the <code>cmd/freegeoip</code> directory. So navigate into it and run,</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>go get
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This dowloads all the dependent packages. This is something similar to <code>bundle install</code> in Ruby. And then run,</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>go install
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>
-This builds the Go app and puts the binary file into the <code>GOBIN</code> directory. In our case its <code>/usr/bin/g</code>.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>ls /usr/bin/g
-</span><span class='line'>freegeoip
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p></p>
-
-<h4>4. Start the server</h4>
-
-<p>To run the app simply navigtate to the <code>/usr/bin/g</code> folder and run</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>./freegeoip
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This will boot up the freegeoip server which listens by default at port 8080. At first boot it downloads the IP database from MaxMind. Once its done you can start sending requests to it. Try this:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>curl -i http://localhost:8080/json/8.8.8.8
-</span><span class='line'><span class="o">{</span><span class="s2">&quot;ip&quot;</span>:<span class="s2">&quot;8.8.8.8&quot;</span>,<span class="s2">&quot;country_code&quot;</span>:<span class="s2">&quot;US&quot;</span>,<span class="s2">&quot;country_name&quot;</span>:<span class="s2">&quot;United States&quot;</span>,<span class="s2">&quot;region_code&quot;</span>:<span class="s2">&quot;CA&quot;</span>,<span class="s2">&quot;region_name&quot;</span>:<span class="s2">&quot;California&quot;</span>,<span class="s2">&quot;city&quot;</span>:<span class="s2">&quot;Mountain View&quot;</span>,<span class="s2">&quot;zip_code&quot;</span>:<span class="s2">&quot;&quot;</span>,<span class="s2">&quot;time_zone&quot;</span>:<span class="s2">&quot;America/Los_Angeles&quot;</span>,<span class="s2">&quot;latitude&quot;</span>:37.386,<span class="s2">&quot;longitude&quot;</span>:-122.084,<span class="s2">&quot;metro_code&quot;</span>:807<span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This returns the geolocation details of the IP address <code>8.8.8.8</code> in JSON format. Awesome right?</p>
-
-<h4>5. Install as a service</h4>
-
-<p>Now this server is attached to the terminal. Once you terminate the terminal or disconnect SSH the server will be terminated.</p>
-
-<p>Let&rsquo;s install the app as a service in our server using Ubuntu <a href="http://upstart.ubuntu.com/">Upstart</a> so they can be managed easily. I&rsquo;ve never done this kinda thing before but doing this was fairly straightforward. All you have to do is drop a configuration file into the <code>/etc/init</code> directory and BOOM you can do things like <code>start service_name</code>, <code>stop service_name</code>, <code>status service_name</code>, etc to manage the service.</p>
-
-<p>The FreeGeoIP project comes with an upstart conf file. But I wanted a little more. I wanted it to print out its PID to a file so thast the service can be tracked and monitored (we&rsquo;ll come to that bit later). So here is the conf file I used.</p>
-
-<figure class='code'><figcaption><span>freegeoip.conf</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>description <span class="s2">&quot;freegeoip web server&quot;</span>
-</span><span class='line'>
-</span><span class='line'>start on runlevel <span class="o">[</span>2345<span class="o">]</span>
-</span><span class='line'>stop on runlevel <span class="o">[</span>!2345<span class="o">]</span>
-</span><span class='line'>
-</span><span class='line'>script
-</span><span class='line'>  <span class="nb">echo</span> <span class="nv">$$</span> &gt; /var/run/freegeoip.pid
-</span><span class='line'>  <span class="nb">exec</span> /usr/local/freegeoip -silent
-</span><span class='line'>end script
-</span><span class='line'>
-</span><span class='line'>post-start script
-</span><span class='line'>   <span class="nb">echo</span> <span class="s2">&quot;freegeoip started&quot;</span>
-</span><span class='line'>end script
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>I am not gonna explain this thing line by line but its all incredibly easy to understand if you refer the Upstart documentation. Once you got this in place run the following command to refresh Upstart. People claim this is not needed but I had to do this several times to get Upstart to recognise the new configuration file.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>initctl reload-configuration
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>If everything is fine, you should see <code>freegeoip</code> in the list given by the command,</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>initctl list
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>and then you can simply do,</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>start freegeoip
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>to startup the service. Try doing <code>status freegeoip</code> to make sure its running. You should also see that the PID of the freegeoip process is found in the <code>/var/run/freegeoip.pid</code> file. At this point everything is setup. You can go ahead and configure the geocoder gem to use this own FreeGeoIP installation for geocoding. But since this is a critical service for our app I wanted to add some safety measures in place.</p>
-
-<h4>6. Configuring with Monit</h4>
-
-<p>We use <a href="http://mmonit.com/monit/">Monit</a> which is an extremely lightweight system monitoring and error recovery tool that can watch the processes or files you want and take actions when certain things happen. Like restart your app when it goes down, restart your processes if they take more memory, etc and also it allows you to setup alerts. Monit also provides a nice web interface using which you can get a glimpse of the processes running in your system. Installing Monit is super easy. Just follow the instructions in the website.</p>
-
-<p>Once you got Monit installed configuring it is pretty simple. Here is the configuration I added for monitoring the <code>freegeoip</code> process.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>check process freegeoip with pidfile /var/run/freegeoip.pid
-</span><span class='line'>  start <span class="nv">program</span> <span class="o">=</span> <span class="s2">&quot;/sbin/start freegeoip&quot;</span>
-</span><span class='line'>  stop <span class="nv">program</span> <span class="o">=</span> <span class="s2">&quot;/sbin/stop freegeoip&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Very expressive. Right? We tell monit to keep track of the process with name <code>freegeoip</code> with the PID form the file <code>/var/run/freegeoip.pid</code> (now do you get why I wanted the PID so badly?). We then tell monit how to start and stop the process. By default monit will keep watch and when the process goes down for some reason monit will start it back up again. Thus there would be minimal disruption in service.</p>
-
-<p>Add this configuration into a file <code>monit-freegeoip.conf</code> in the <code>/etc/monit/monit.d</code> directory. By default whatever file you add here will be included in the <code>/etc/monit/monitrc</code> file which is the main configuration file. This happens due to this line at the bottom of the <code>monitrc</code> file - <code>include /etc/monit/monit.d/*.conf</code>.</p>
-
-<p>Restart monit using <code>sudo service monit restart</code> and do <code>monit status</code> and you&rsquo;ll find info about the <code>freegeoip</code> process in the output. It should be something like this -</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>Process <span class="s1">&#39;freegeoip&#39;</span>
-</span><span class='line'>  status                            Running
-</span><span class='line'>  monitoring status                 Monitored
-</span><span class='line'>  pid                               12155
-</span><span class='line'>  parent pid                        1
-</span><span class='line'>  uptime                            4d 6h 57m
-</span><span class='line'>  children                          0
-</span><span class='line'>  memory kilobytes                  7084
-</span><span class='line'>  memory kilobytes total            7084
-</span><span class='line'>  memory percent                    0.4%
-</span><span class='line'>  memory percent total              0.4%
-</span><span class='line'>  cpu percent                       0.0%
-</span><span class='line'>  cpu percent total                 0.0%
-</span><span class='line'>  data collected                    Mon, <span class="m">01</span> Dec <span class="m">2014</span> 07:54:17
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Great. Now if freegeoip goes down for some reason, monit will start right back up again and we can sleep peacefully without any worries :)</p>
-
-<p>Lets do a small recap of what we&rsquo;ve done.</p>
-
-<ol>
-<li>We installed Go</li>
-<li>We built and ran the FreeGeoIP Go project</li>
-<li>We installed it as a service using Upstart</li>
-<li>We configured Monit to monitor the process</li>
-</ol>
-
-
-<p>Hope this was useful and not boring :)</p>
-
-<p>Back to my problem. Once I got our very own FreeGeoIP service running, all I had to do is configure the Geocoder gem to use this instead of freegeoip.net. Upon consulting the documentation I learned that it was as easy as doing the following in a Rails initializer.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">Geocoder</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span>
-</span><span class='line'>  <span class="ss">timeout</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
-</span><span class='line'>  <span class="ss">:ip_lookup</span> <span class="o">=&gt;</span> <span class="ss">:freegeoip</span><span class="p">,</span>
-</span><span class='line'>  <span class="ss">:freegeoip</span> <span class="o">=&gt;</span> <span class="p">{</span>
-</span><span class='line'>    <span class="ss">:host</span> <span class="o">=&gt;</span> <span class="s2">&quot;myserver.com:8080&quot;</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>And now for the moment of truth. I hooked onto Rails console and typed the following statement - <code>Geocoder.search "8.8.8.8"</code> and what do I get? <code>Errno::ECONNREFUSED: Connection refused - connect(2)</code></p>
-
-<p>Same old error again. I was completely puzzled. I checked monit to see if the service was still up and it was up. I used <code>curl</code> again to hit the freegeoip service and it was working fine. Something somewhere was going horribly wrong. I realized something was up with geocoder and I opened up the source code on GitHub to see where the <code>:host</code> configuration was used and try to find out if it was really  using the host supplied by me.</p>
-
-<p>This method in the file <a href="https://github.com/alexreisner/geocoder/blob/master/lib/geocoder/lookups/freegeoip.rb#L11"><code>lib/geocoder/lookups/freegeoip.rb</code></a> was responsible for building the query URL and it used this <code>host</code> private method which inturn checked the <code>configuration</code> hash to see if <code>:host</code> was supplied and if so it used it and if not it fellback to <code>freegeoip.net</code>.</p>
-
-<figure class='code'><figcaption><span>freegeoip.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">query_url</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
-</span><span class='line'>  <span class="s2">&quot;</span><span class="si">#{</span><span class="n">protocol</span><span class="si">}</span><span class="s2">://</span><span class="si">#{</span><span class="n">host</span><span class="si">}</span><span class="s2">/json/</span><span class="si">#{</span><span class="n">query</span><span class="o">.</span><span class="n">sanitized_text</span><span class="si">}</span><span class="s2">&quot;</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="kp">private</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">def</span> <span class="nf">host</span>
-</span><span class='line'>  <span class="n">configuration</span><span class="o">[</span><span class="ss">:host</span><span class="o">]</span> <span class="o">||</span> <span class="s2">&quot;freegeoip.net&quot;</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>All seems fine. I decided to log this <code>query_url</code> to the console by editing the gem&rsquo;s source on my machine. To do this I used <code>bundle open</code> to open up the geocoder source code locally. When I opened up the <code>freegeoip.rb</code> file, what I found was slightly different from what I saw on GitHub. Here&rsquo;s the <code>query_url</code> method that I had on my local development setup.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">query_url</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
-</span><span class='line'>  <span class="s2">&quot;</span><span class="si">#{</span><span class="n">protocol</span><span class="si">}</span><span class="s2">://freegeoip.net/json/</span><span class="si">#{</span><span class="n">query</span><span class="o">.</span><span class="n">sanitized_text</span><span class="si">}</span><span class="s2">&quot;</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>As you can see there was no way to configure the host here. As it turned out I was using an older version of the gem. So I went ahead and did a <code>bundle update geocoder</code> and then ran <code>Geocoder.search "8.8.8.8"</code> and I got,</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">=&gt;</span> <span class="o">[</span><span class="c1">#&lt;Geocoder::Result::Google:0x000000062888a8</span>
-</span><span class='line'>  <span class="vi">@cache_hit</span><span class="o">=</span><span class="kp">nil</span><span class="p">,</span>
-</span><span class='line'>  <span class="vi">@data</span><span class="o">=</span>
-</span><span class='line'>   <span class="p">{</span><span class="s2">&quot;address_components&quot;</span><span class="o">=&gt;</span>
-</span><span class='line'>     <span class="o">[</span><span class="p">{</span><span class="s2">&quot;long_name&quot;</span><span class="o">=&gt;</span><span class="s2">&quot;Route 8&quot;</span><span class="p">,</span> <span class="s2">&quot;short_name&quot;</span><span class="o">=&gt;</span><span class="s2">&quot;LA-8&quot;</span><span class="p">,</span> <span class="s2">&quot;types&quot;</span><span class="o">=&gt;[</span><span class="s2">&quot;route&quot;</span><span class="o">]</span><span class="p">},</span>
-</span><span class='line'>      <span class="p">{</span><span class="s2">&quot;long_name&quot;</span><span class="o">=&gt;</span><span class="s2">&quot;Louisiana&quot;</span><span class="p">,</span> <span class="s2">&quot;short_name&quot;</span><span class="o">=&gt;</span><span class="s2">&quot;LA&quot;</span><span class="p">,</span> <span class="s2">&quot;types&quot;</span><span class="o">=&gt;[</span><span class="s2">&quot;administrative_area_level_1&quot;</span><span class="p">,</span> <span class="s2">&quot;political&quot;</span><span class="o">]</span><span class="p">},</span>
-</span><span class='line'>      <span class="p">{</span><span class="s2">&quot;long_name&quot;</span><span class="o">=&gt;</span><span class="s2">&quot;United States&quot;</span><span class="p">,</span> <span class="s2">&quot;short_name&quot;</span><span class="o">=&gt;</span><span class="s2">&quot;US&quot;</span><span class="p">,</span> <span class="s2">&quot;types&quot;</span><span class="o">=&gt;[</span><span class="s2">&quot;country&quot;</span><span class="p">,</span> <span class="s2">&quot;political&quot;</span><span class="o">]</span><span class="p">}</span><span class="o">]</span><span class="p">,</span>
-</span><span class='line'>    <span class="s2">&quot;formatted_address&quot;</span><span class="o">=&gt;</span><span class="s2">&quot;Louisiana 8, Louisiana, USA&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="s2">&quot;geometry&quot;</span><span class="o">=&gt;</span>
-</span><span class='line'>     <span class="p">{</span><span class="s2">&quot;bounds&quot;</span><span class="o">=&gt;</span><span class="p">{</span><span class="s2">&quot;northeast&quot;</span><span class="o">=&gt;</span><span class="p">{</span><span class="s2">&quot;lat&quot;</span><span class="o">=&gt;</span><span class="mi">31</span><span class="o">.</span><span class="mi">8475579</span><span class="p">,</span> <span class="s2">&quot;lng&quot;</span><span class="o">=&gt;-</span><span class="mi">91</span><span class="o">.</span><span class="mi">6569889</span><span class="p">},</span> <span class="s2">&quot;southwest&quot;</span><span class="o">=&gt;</span><span class="p">{</span><span class="s2">&quot;lat&quot;</span><span class="o">=&gt;</span><span class="mi">31</span><span class="o">.</span><span class="mo">0643337</span><span class="p">,</span> <span class="s2">&quot;lng&quot;</span><span class="o">=&gt;-</span><span class="mi">93</span><span class="o">.</span><span class="mi">5195453</span><span class="p">}},</span>
-</span><span class='line'>      <span class="s2">&quot;location&quot;</span><span class="o">=&gt;</span><span class="p">{</span><span class="s2">&quot;lat&quot;</span><span class="o">=&gt;</span><span class="mi">31</span><span class="o">.</span><span class="mi">523812</span><span class="p">,</span> <span class="s2">&quot;lng&quot;</span><span class="o">=&gt;-</span><span class="mi">92</span><span class="o">.</span><span class="mi">587424</span><span class="p">},</span>
-</span><span class='line'>      <span class="s2">&quot;location_type&quot;</span><span class="o">=&gt;</span><span class="s2">&quot;GEOMETRIC_CENTER&quot;</span><span class="p">,</span>
-</span><span class='line'>      <span class="s2">&quot;viewport&quot;</span><span class="o">=&gt;</span><span class="p">{</span><span class="s2">&quot;northeast&quot;</span><span class="o">=&gt;</span><span class="p">{</span><span class="s2">&quot;lat&quot;</span><span class="o">=&gt;</span><span class="mi">31</span><span class="o">.</span><span class="mi">8475579</span><span class="p">,</span> <span class="s2">&quot;lng&quot;</span><span class="o">=&gt;-</span><span class="mi">91</span><span class="o">.</span><span class="mi">6569889</span><span class="p">},</span> <span class="s2">&quot;southwest&quot;</span><span class="o">=&gt;</span><span class="p">{</span><span class="s2">&quot;lat&quot;</span><span class="o">=&gt;</span><span class="mi">31</span><span class="o">.</span><span class="mo">0643337</span><span class="p">,</span> <span class="s2">&quot;lng&quot;</span><span class="o">=&gt;-</span><span class="mi">93</span><span class="o">.</span><span class="mi">5195453</span><span class="p">}}},</span>
-</span><span class='line'>    <span class="s2">&quot;partial_match&quot;</span><span class="o">=&gt;</span><span class="kp">true</span><span class="p">,</span>
-</span><span class='line'>    <span class="s2">&quot;types&quot;</span><span class="o">=&gt;[</span><span class="s2">&quot;route&quot;</span><span class="o">]</span><span class="p">}</span><span class="o">&gt;]</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Massive relief. Finally!</p>
-
-<p>Deployed all this to production and within some hours we noticed improvements in the response times. And the breakdown table from NewRelic for the same landing page action now shows how much we have improved.</p>
-
-<p><img src="http://i.imgur.com/MwAoGBc.png"></p>
-
-<p>For me this was an extremely good learning experience. I hope this blog was useful and interesting for you as well :) Do leave your comments below!</p>
 </div>
   
+  
+    <footer>
+      <a rel="full-article" href="/blog/2014/11/30/your-own-geocoding-service/">Read on &rarr;</a>
+    </footer>
   
 
 
@@ -600,7 +267,7 @@ This builds the Go app and puts the binary file into the <code>GOBIN</code> dire
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2014/11/30/your-own-geocoding-service/">Your Own Geocoding Service</a>
+        <a href="/blog/2014/11/30/your-own-geocoding-service/">Hosting FreeGeoIP in Your Cloud</a>
       </li>
     
       <li class="post">
