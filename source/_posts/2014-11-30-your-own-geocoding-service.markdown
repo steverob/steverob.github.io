@@ -20,6 +20,8 @@ end
 ```
 The `location` method called on `request` is actually provided by this super awesome and popular Geocoding gem called [geocoder](https://github.com/alexreisner/geocoder) and it returns the country from which the request originated. It figures this information out using the IP address available in the request object. Okay but how does the geocoder gem finds the country from an IP address? For doing that geocoder actually talks to an external service called [FreeGeoIP](http://freegeoip.net) which is a service written in Go-lang. Btw, Geocoder supports many more such geocoding services like the ones provided by Google, MaxMind etc. FreeGeoIP is completely free and has a fairly reasonable rate-limit (10000 requests / hr). We deployed this part to production and it was working fine until I noticed some performance issues within couple of days.
 
+<!--more-->
+
 As most of you might have guessed, making a request to an external service can be a pretty costly affair and can ruin the response times of your app if you are using it in a crucial place like how we use in our app. The worst part is that whenever a new user visits our site for the first time they are forced to go through this process and consequently the inital page load took too long. Below is the breakdown table for our landing page's controller action provided by NewRelic. As you can see this request to freegeoip.net is slowing things down a lot.
 
 {% img http://i.imgur.com/MwAoGBc.png %}
