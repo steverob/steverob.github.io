@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ruby | Steve Robinson]]></title>
   <link href="http://steverob.github.io/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://steverob.github.io/"/>
-  <updated>2014-12-02T00:23:54+05:30</updated>
+  <updated>2015-03-07T02:20:12+05:30</updated>
   <id>http://steverob.github.io/</id>
   <author>
     <name><![CDATA[Steve Robinson]]></name>
@@ -12,6 +12,69 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Ruby 2.0 Boosts Rails Boot Time]]></title>
+    <link href="http://steverob.github.io/blog/2015/01/21/ruby-2-dot-0-boosts-rails-boot-time/"/>
+    <updated>2015-01-21T19:23:54+05:30</updated>
+    <id>http://steverob.github.io/blog/2015/01/21/ruby-2-dot-0-boosts-rails-boot-time</id>
+    <content type="html"><![CDATA[<p>I&rsquo;ve been working on a codebase which is Rails 4.0 and Ruby 1.9.3 and something that&rsquo;s annoying about this app is its incredibly large load time. It takes about 26 seconds to boot up.</p>
+
+<p><code>bundle exec rake environment  22.22s user 1.14s system 91% cpu 25.632 total</code></p>
+
+<p>Now we&rsquo;re not doing anything fancy during the bootup so I figured it must the gems that we are loading that&rsquo;s taking so much time.
+While googling for ways to debug the boot time I came across this really cool gem called <a href="https://github.com/nevir/Bumbler">Bumbler</a> which prints out the load times for each and every gem in your app.</p>
+
+<p>These are some of the gems that were taking lots of time to load.</p>
+
+<pre><code>    367.43  rails
+    408.94  fuubar
+    420.56  slim
+    441.58  pry-rails
+    488.60  activemerchant
+    651.05  meta-tags
+    986.72  axlsx
+    1231.87  newrelic_rpm
+    1303.99  geocoder
+    2749.84  fog
+    3044.00  carrierwave
+</code></pre>
+
+<p>Its amazing that it takes 3 seconds to load carrierwave.
+I double checked my initializers to make sure there&rsquo;s nothing that could slow down the loading and there was none.
+So is Ruby&rsquo;s <code>require</code> slow?</p>
+
+<p>To find out I did some digging and ended up at this <a href="https://bugs.ruby-lang.org/issues/7158">bug report</a> which talks about improvements to Ruby&rsquo;s <code>require</code> method.
+It seems when requiring a file Ruby iterates through the <code>$LOAD_PATHS</code> array to see if the file is loaded which is extremely ineffecient if there are many files to load.
+The patch made uses a hash to maintain the loaded files so that it can be looked up in O(1) time.
+This is explained by Xavier Shay <a href="http://rhnh.net/2011/05/28/speeding-up-rails-startup-time">here</a>.</p>
+
+<p>In addition to this the string objects in the arrays <code>$LOAD_PATHS</code> and <code>$LOADED_FEATURES</code> are also frozen so these can be cached.
+Freezing strings makes them immutable. This is well explained in this <a href="http://magazine.rubyist.net/?Ruby200SpecialEn-require">other article</a> by <a href="https://twitter.com/taru">Masaya Tarui</a>, author of the patch.</p>
+
+<p>All this has made Ruby 2.0 require files much faster. I temporarily switched to Ruby 2.2 and take a look at this -
+<code>bundle exec rake environment  3.95s user 0.85s system 99% cpu 4.822 total</code>.</p>
+
+<p>Bumbler report:</p>
+
+<pre><code>    102.74  countries
+    103.72  haml-rails
+    117.40  devise
+    122.33  foundation-rails
+    130.76  newrelic_rpm
+    132.80  pry-rails
+    144.39  sass-rails
+    163.59  activemerchant
+    169.82  rails
+    195.35  axlsx
+    261.47  geocoder
+    632.77  fog
+    780.72  carrierwave
+</code></pre>
+
+<p>That&rsquo;s a whopping 81% improvement over Ruby 1.9.3 in my case. Your mileage may vary. But this is amazing. So as soon as I get the chance I am going to upgrade to Ruby 2.2 :)</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Hosting FreeGeoIP in Your Cloud]]></title>

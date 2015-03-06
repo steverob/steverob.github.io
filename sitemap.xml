@@ -3,6 +3,12 @@
   
   
   <url>
+    <loc>http://steverob.github.io/blog/2015/01/21/ruby-2-dot-0-boosts-rails-boot-time/</loc>
+    <lastmod>2015-01-21T19:23:54+05:30</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
     <loc>http://steverob.github.io/blog/2014/11/30/your-own-geocoding-service/</loc>
     <lastmod>2014-11-30T21:11:02+05:30</lastmod>
     <priority>0.8</priority>
@@ -29,14 +35,14 @@
   
   <url>
     <loc>http://steverob.github.io/</loc>
-    <lastmod>2014-12-02T00:23:54+05:30</lastmod>
+    <lastmod>2015-03-07T02:20:12+05:30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   
   <url>
     <loc>http://steverob.github.io/blog/archives/</loc>
-    <lastmod>2014-12-02T00:23:54+05:30</lastmod>
+    <lastmod>2015-03-07T02:20:12+05:30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>

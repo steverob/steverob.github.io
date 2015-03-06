@@ -1,0 +1,295 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Ruby 2.0 Boosts Rails Boot Time - Steve Robinson</title>
+  <meta name="author" content="Steve Robinson">
+
+  
+  <meta name="description" content="I&rsquo;ve been working on a codebase which is Rails 4.0 and Ruby 1.9.3 and something that&rsquo;s annoying about this app is its incredibly large &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://steverob.github.io/blog/2015/01/21/ruby-2-dot-0-boosts-rails-boot-time">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Steve Robinson" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Steve Robinson</a></h1>
+  
+    <h2>My life, code & random musings...</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:steverob.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Ruby 2.0 Boosts Rails Boot Time</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-01-21T19:23:54+05:30" pubdate data-updated="true">Jan 21<sup>st</sup>, 2015</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>I&rsquo;ve been working on a codebase which is Rails 4.0 and Ruby 1.9.3 and something that&rsquo;s annoying about this app is its incredibly large load time. It takes about 26 seconds to boot up.</p>
+
+<p><code>bundle exec rake environment  22.22s user 1.14s system 91% cpu 25.632 total</code></p>
+
+<p>Now we&rsquo;re not doing anything fancy during the bootup so I figured it must the gems that we are loading that&rsquo;s taking so much time.
+While googling for ways to debug the boot time I came across this really cool gem called <a href="https://github.com/nevir/Bumbler">Bumbler</a> which prints out the load times for each and every gem in your app.</p>
+
+<p>These are some of the gems that were taking lots of time to load.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>367.43  rails
+</span><span class='line'>408.94  fuubar
+</span><span class='line'>420.56  slim
+</span><span class='line'>441.58  pry-rails
+</span><span class='line'>488.60  activemerchant
+</span><span class='line'>651.05  meta-tags
+</span><span class='line'>986.72  axlsx
+</span><span class='line'>1231.87  newrelic_rpm
+</span><span class='line'>1303.99  geocoder
+</span><span class='line'>2749.84  fog
+</span><span class='line'>3044.00  carrierwave</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Its amazing that it takes 3 seconds to load carrierwave.
+I double checked my initializers to make sure there&rsquo;s nothing that could slow down the loading and there was none.
+So is Ruby&rsquo;s <code>require</code> slow?</p>
+
+<p>To find out I did some digging and ended up at this <a href="https://bugs.ruby-lang.org/issues/7158">bug report</a> which talks about improvements to Ruby&rsquo;s <code>require</code> method.
+It seems when requiring a file Ruby iterates through the <code>$LOAD_PATHS</code> array to see if the file is loaded which is extremely ineffecient if there are many files to load.
+The patch made uses a hash to maintain the loaded files so that it can be looked up in O(1) time.
+This is explained by Xavier Shay <a href="http://rhnh.net/2011/05/28/speeding-up-rails-startup-time">here</a>.</p>
+
+<p>In addition to this the string objects in the arrays <code>$LOAD_PATHS</code> and <code>$LOADED_FEATURES</code> are also frozen so these can be cached.
+Freezing strings makes them immutable. This is well explained in this <a href="http://magazine.rubyist.net/?Ruby200SpecialEn-require">other article</a> by <a href="https://twitter.com/taru">Masaya Tarui</a>, author of the patch.</p>
+
+<p>All this has made Ruby 2.0 require files much faster. I temporarily switched to Ruby 2.2 and take a look at this -
+<code>bundle exec rake environment  3.95s user 0.85s system 99% cpu 4.822 total</code>.</p>
+
+<p>Bumbler report:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>102.74  countries
+</span><span class='line'>103.72  haml-rails
+</span><span class='line'>117.40  devise
+</span><span class='line'>122.33  foundation-rails
+</span><span class='line'>130.76  newrelic_rpm
+</span><span class='line'>132.80  pry-rails
+</span><span class='line'>144.39  sass-rails
+</span><span class='line'>163.59  activemerchant
+</span><span class='line'>169.82  rails
+</span><span class='line'>195.35  axlsx
+</span><span class='line'>261.47  geocoder
+</span><span class='line'>632.77  fog
+</span><span class='line'>780.72  carrierwave</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That&rsquo;s a whopping 81% improvement over Ruby 1.9.3 in my case. Your mileage may vary. But this is amazing. So as soon as I get the chance I am going to upgrade to Ruby 2.2 :)</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Steve Robinson</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-01-21T19:23:54+05:30" pubdate data-updated="true">Jan 21<sup>st</sup>, 2015</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/ruby/'>ruby</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://steverob.github.io/blog/2015/01/21/ruby-2-dot-0-boosts-rails-boot-time/" data-via="stev4nity" data-counturl="http://steverob.github.io/blog/2015/01/21/ruby-2-dot-0-boosts-rails-boot-time/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2014/11/30/your-own-geocoding-service/" title="Previous Post: Hosting FreeGeoIP in your cloud">&laquo; Hosting FreeGeoIP in your cloud</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/01/21/ruby-2-dot-0-boosts-rails-boot-time/">Ruby 2.0 Boosts Rails Boot Time</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/11/30/your-own-geocoding-service/">Hosting FreeGeoIP in Your Cloud</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/10/31/outsourcing-image-processing/">Outsourcing Image Processing</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/09/23/on-foundations-validation-and-my-pull-request/">On Foundation's Validation &amp; My Pull Request</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/08/10/a-fresh-start/">A Fresh Start</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Steve Robinson -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
