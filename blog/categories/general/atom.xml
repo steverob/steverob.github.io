@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: General | Steve Robinson]]></title>
-  <link href="http://steverob.github.io/blog/categories/general/atom.xml" rel="self"/>
-  <link href="http://steverob.github.io/"/>
-  <updated>2015-03-07T02:20:12+05:30</updated>
-  <id>http://steverob.github.io/</id>
+  <link href="http://steverobinson.in/blog/categories/general/atom.xml" rel="self"/>
+  <link href="http://steverobinson.in/"/>
+  <updated>2015-03-07T19:40:19+05:30</updated>
+  <id>http://steverobinson.in/</id>
   <author>
     <name><![CDATA[Steve Robinson]]></name>
     <email><![CDATA[steve.rob@me.com]]></email>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[A Fresh Start]]></title>
-    <link href="http://steverob.github.io/blog/2014/08/10/a-fresh-start/"/>
+    <link href="http://steverobinson.in/blog/2014/08/10/a-fresh-start/"/>
     <updated>2014-08-10T11:04:08+05:30</updated>
-    <id>http://steverob.github.io/blog/2014/08/10/a-fresh-start</id>
+    <id>http://steverobinson.in/blog/2014/08/10/a-fresh-start</id>
     <content type="html"><![CDATA[<p>Its my birthday and I&rsquo;m turning 23 today. I&rsquo;ve been meaning to start a new blog (old one <a href="http://footyntech.wordpress.com">here</a>) for a while now and I&rsquo;ve finally taken that step today. I love blogging and I encourage people around me to do it but then for several months, interestingly right after I feel in love with Ruby and Rails I&rsquo;ve stopped writing completely. I do not know why that happened but it just happened. I wrote these <em>come back posts</em> whenever I felt inspired to write something and I promised I would resume blogging but I never did. And I really don&rsquo;t know if this new blog would be any different. But I hope it is.</p>
 
 <p>Alright why am I starting a new blog? Well, I don&rsquo;t have a proper reason for that. Its like I just don&rsquo;t feel like writing anymore over there in my old blog. Whenever I go through the old stuff I wrote, for some reason, I feel it just does not reflect who I am now. Maybe it did when I wrote them but now I think I&rsquo;ve changed a lot. So I want to start afresh with this new blog.</p>

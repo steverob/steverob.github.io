@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Scaling | Steve Robinson]]></title>
-  <link href="http://steverob.github.io/blog/categories/scaling/atom.xml" rel="self"/>
-  <link href="http://steverob.github.io/"/>
-  <updated>2015-03-07T02:20:12+05:30</updated>
-  <id>http://steverob.github.io/</id>
+  <link href="http://steverobinson.in/blog/categories/scaling/atom.xml" rel="self"/>
+  <link href="http://steverobinson.in/"/>
+  <updated>2015-03-07T19:40:19+05:30</updated>
+  <id>http://steverobinson.in/</id>
   <author>
     <name><![CDATA[Steve Robinson]]></name>
     <email><![CDATA[steve.rob@me.com]]></email>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Outsourcing Image Processing]]></title>
-    <link href="http://steverob.github.io/blog/2014/10/31/outsourcing-image-processing/"/>
+    <link href="http://steverobinson.in/blog/2014/10/31/outsourcing-image-processing/"/>
     <updated>2014-10-31T01:06:26+05:30</updated>
-    <id>http://steverob.github.io/blog/2014/10/31/outsourcing-image-processing</id>
+    <id>http://steverobinson.in/blog/2014/10/31/outsourcing-image-processing</id>
     <content type="html"><![CDATA[<p>One of our clients at Spritle is a startup that sells photos taken at various events. The Rails app we have built and maintaining for them involves photographers uploading large numbers of photos (each photographer uploads around 500-1000 images per album and we have lots of photographers, albums &amp; events!) at a time and processing these images into three versions of different dimensions. One of these versions also needs a watermark to be placed on it. We had a very basic setup to do all this work but it was not good enough and subsequently we offloaded the heavyligting to a cloud service. But before that let me explain how we were doing things before offloading the processing.</p>
 
 <!--more-->

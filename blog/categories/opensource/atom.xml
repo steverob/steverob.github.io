@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Opensource | Steve Robinson]]></title>
-  <link href="http://steverob.github.io/blog/categories/opensource/atom.xml" rel="self"/>
-  <link href="http://steverob.github.io/"/>
-  <updated>2015-03-07T02:20:12+05:30</updated>
-  <id>http://steverob.github.io/</id>
+  <link href="http://steverobinson.in/blog/categories/opensource/atom.xml" rel="self"/>
+  <link href="http://steverobinson.in/"/>
+  <updated>2015-03-07T19:40:19+05:30</updated>
+  <id>http://steverobinson.in/</id>
   <author>
     <name><![CDATA[Steve Robinson]]></name>
     <email><![CDATA[steve.rob@me.com]]></email>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[On Foundation's Validation &amp; My Pull Request]]></title>
-    <link href="http://steverob.github.io/blog/2014/09/23/on-foundations-validation-and-my-pull-request/"/>
+    <link href="http://steverobinson.in/blog/2014/09/23/on-foundations-validation-and-my-pull-request/"/>
     <updated>2014-09-23T02:51:42+05:30</updated>
-    <id>http://steverob.github.io/blog/2014/09/23/on-foundations-validation-and-my-pull-request</id>
+    <id>http://steverobinson.in/blog/2014/09/23/on-foundations-validation-and-my-pull-request</id>
     <content type="html"><![CDATA[<p>We widely use the amazing <a href="http://foundation.zurb.com/">Zurb Foundation</a> framework as a base for many of our projects at work. Foundation provides a lot of features and utilities out of the box. One such useful feature is the JavaScript form validation library which they call <a href="http://foundation.zurb.com/docs/components/abide.html">Abide</a>.</p>
 
 <p>Abide is powerful and also flexible. There are a lot of configuration options and it even allows us to easily add custom validations in addition to the ones it provides out of the box. Foundation Abide was working out fine for us until recently when a client of ours asked for a change in the way validation works in the app we do for them.</p>

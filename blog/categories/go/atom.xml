@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Go | Steve Robinson]]></title>
-  <link href="http://steverob.github.io/blog/categories/go/atom.xml" rel="self"/>
-  <link href="http://steverob.github.io/"/>
-  <updated>2015-03-07T02:20:12+05:30</updated>
-  <id>http://steverob.github.io/</id>
+  <link href="http://steverobinson.in/blog/categories/go/atom.xml" rel="self"/>
+  <link href="http://steverobinson.in/"/>
+  <updated>2015-03-07T19:40:19+05:30</updated>
+  <id>http://steverobinson.in/</id>
   <author>
     <name><![CDATA[Steve Robinson]]></name>
     <email><![CDATA[steve.rob@me.com]]></email>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Hosting FreeGeoIP in Your Cloud]]></title>
-    <link href="http://steverob.github.io/blog/2014/11/30/your-own-geocoding-service/"/>
+    <link href="http://steverobinson.in/blog/2014/11/30/your-own-geocoding-service/"/>
     <updated>2014-11-30T21:11:02+05:30</updated>
-    <id>http://steverob.github.io/blog/2014/11/30/your-own-geocoding-service</id>
+    <id>http://steverobinson.in/blog/2014/11/30/your-own-geocoding-service</id>
     <content type="html"><![CDATA[<p>In the project I&rsquo;m working on where we sell photos, we had to find out the country of each and every visitor for a certain business purpose. So we have this piece of code in the Rails <code>ApplicationController</code> to do the job.</p>
 
 <pre><code class="ruby">def set_country_currency

@@ -1,4 +1,4 @@
 User-agent: *
 Disallow: 
 
-Sitemap: http://steverob.github.io/sitemap.xml 
+Sitemap: http://steverobinson.in/sitemap.xml 

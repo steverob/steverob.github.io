@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Steve Robinson]]></title>
-  <link href="http://steverob.github.io/atom.xml" rel="self"/>
-  <link href="http://steverob.github.io/"/>
-  <updated>2015-03-07T02:20:12+05:30</updated>
-  <id>http://steverob.github.io/</id>
+  <link href="http://steverobinson.in/atom.xml" rel="self"/>
+  <link href="http://steverobinson.in/"/>
+  <updated>2015-03-07T19:40:19+05:30</updated>
+  <id>http://steverobinson.in/</id>
   <author>
     <name><![CDATA[Steve Robinson]]></name>
     <email><![CDATA[steve.rob@me.com]]></email>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Ruby 2.0 Boosts Rails Boot Time]]></title>
-    <link href="http://steverob.github.io/blog/2015/01/21/ruby-2-dot-0-boosts-rails-boot-time/"/>
+    <link href="http://steverobinson.in/blog/2015/01/21/ruby-2-dot-0-boosts-rails-boot-time/"/>
     <updated>2015-01-21T19:23:54+05:30</updated>
-    <id>http://steverob.github.io/blog/2015/01/21/ruby-2-dot-0-boosts-rails-boot-time</id>
+    <id>http://steverobinson.in/blog/2015/01/21/ruby-2-dot-0-boosts-rails-boot-time</id>
     <content type="html"><![CDATA[<p>I&rsquo;ve been working on a codebase which is Rails 4.0 and Ruby 1.9.3 and something that&rsquo;s annoying about this app is its incredibly large load time. It takes about 26 seconds to boot up.</p>
 
 <p><code>bundle exec rake environment  22.22s user 1.14s system 91% cpu 25.632 total</code></p>
@@ -102,9 +102,9 @@ Freezing strings makes them immutable. This is well explained in this <a href="h
   
   <entry>
     <title type="html"><![CDATA[Hosting FreeGeoIP in Your Cloud]]></title>
-    <link href="http://steverob.github.io/blog/2014/11/30/your-own-geocoding-service/"/>
+    <link href="http://steverobinson.in/blog/2014/11/30/your-own-geocoding-service/"/>
     <updated>2014-11-30T21:11:02+05:30</updated>
-    <id>http://steverob.github.io/blog/2014/11/30/your-own-geocoding-service</id>
+    <id>http://steverobinson.in/blog/2014/11/30/your-own-geocoding-service</id>
     <content type="html"><![CDATA[<p>In the project I&rsquo;m working on where we sell photos, we had to find out the country of each and every visitor for a certain business purpose. So we have this piece of code in the Rails <code>ApplicationController</code> to do the job.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -473,9 +473,9 @@ This builds the Go app and puts the binary file into the <code>GOBIN</code> dire
   
   <entry>
     <title type="html"><![CDATA[Outsourcing Image Processing]]></title>
-    <link href="http://steverob.github.io/blog/2014/10/31/outsourcing-image-processing/"/>
+    <link href="http://steverobinson.in/blog/2014/10/31/outsourcing-image-processing/"/>
     <updated>2014-10-31T01:06:26+05:30</updated>
-    <id>http://steverob.github.io/blog/2014/10/31/outsourcing-image-processing</id>
+    <id>http://steverobinson.in/blog/2014/10/31/outsourcing-image-processing</id>
     <content type="html"><![CDATA[<p>One of our clients at Spritle is a startup that sells photos taken at various events. The Rails app we have built and maintaining for them involves photographers uploading large numbers of photos (each photographer uploads around 500-1000 images per album and we have lots of photographers, albums &amp; events!) at a time and processing these images into three versions of different dimensions. One of these versions also needs a watermark to be placed on it. We had a very basic setup to do all this work but it was not good enough and subsequently we offloaded the heavyligting to a cloud service. But before that let me explain how we were doing things before offloading the processing.</p>
 
 <!--more-->
@@ -749,9 +749,9 @@ This builds the Go app and puts the binary file into the <code>GOBIN</code> dire
   
   <entry>
     <title type="html"><![CDATA[On Foundation's Validation &amp; My Pull Request]]></title>
-    <link href="http://steverob.github.io/blog/2014/09/23/on-foundations-validation-and-my-pull-request/"/>
+    <link href="http://steverobinson.in/blog/2014/09/23/on-foundations-validation-and-my-pull-request/"/>
     <updated>2014-09-23T02:51:42+05:30</updated>
-    <id>http://steverob.github.io/blog/2014/09/23/on-foundations-validation-and-my-pull-request</id>
+    <id>http://steverobinson.in/blog/2014/09/23/on-foundations-validation-and-my-pull-request</id>
     <content type="html"><![CDATA[<p>We widely use the amazing <a href="http://foundation.zurb.com/">Zurb Foundation</a> framework as a base for many of our projects at work. Foundation provides a lot of features and utilities out of the box. One such useful feature is the JavaScript form validation library which they call <a href="http://foundation.zurb.com/docs/components/abide.html">Abide</a>.</p>
 
 <p>Abide is powerful and also flexible. There are a lot of configuration options and it even allows us to easily add custom validations in addition to the ones it provides out of the box. Foundation Abide was working out fine for us until recently when a client of ours asked for a change in the way validation works in the app we do for them.</p>
@@ -793,9 +793,9 @@ This builds the Go app and puts the binary file into the <code>GOBIN</code> dire
   
   <entry>
     <title type="html"><![CDATA[A Fresh Start]]></title>
-    <link href="http://steverob.github.io/blog/2014/08/10/a-fresh-start/"/>
+    <link href="http://steverobinson.in/blog/2014/08/10/a-fresh-start/"/>
     <updated>2014-08-10T11:04:08+05:30</updated>
-    <id>http://steverob.github.io/blog/2014/08/10/a-fresh-start</id>
+    <id>http://steverobinson.in/blog/2014/08/10/a-fresh-start</id>
     <content type="html"><![CDATA[<p>Its my birthday and I&rsquo;m turning 23 today. I&rsquo;ve been meaning to start a new blog (old one <a href="http://footyntech.wordpress.com">here</a>) for a while now and I&rsquo;ve finally taken that step today. I love blogging and I encourage people around me to do it but then for several months, interestingly right after I feel in love with Ruby and Rails I&rsquo;ve stopped writing completely. I do not know why that happened but it just happened. I wrote these <em>come back posts</em> whenever I felt inspired to write something and I promised I would resume blogging but I never did. And I really don&rsquo;t know if this new blog would be any different. But I hope it is.</p>
 
 <p>Alright why am I starting a new blog? Well, I don&rsquo;t have a proper reason for that. Its like I just don&rsquo;t feel like writing anymore over there in my old blog. Whenever I go through the old stuff I wrote, for some reason, I feel it just does not reflect who I am now. Maybe it did when I wrote them but now I think I&rsquo;ve changed a lot. So I want to start afresh with this new blog.</p>

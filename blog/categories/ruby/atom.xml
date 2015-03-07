@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Ruby | Steve Robinson]]></title>
-  <link href="http://steverob.github.io/blog/categories/ruby/atom.xml" rel="self"/>
-  <link href="http://steverob.github.io/"/>
-  <updated>2015-03-07T02:20:12+05:30</updated>
-  <id>http://steverob.github.io/</id>
+  <link href="http://steverobinson.in/blog/categories/ruby/atom.xml" rel="self"/>
+  <link href="http://steverobinson.in/"/>
+  <updated>2015-03-07T19:40:19+05:30</updated>
+  <id>http://steverobinson.in/</id>
   <author>
     <name><![CDATA[Steve Robinson]]></name>
     <email><![CDATA[steve.rob@me.com]]></email>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Ruby 2.0 Boosts Rails Boot Time]]></title>
-    <link href="http://steverob.github.io/blog/2015/01/21/ruby-2-dot-0-boosts-rails-boot-time/"/>
+    <link href="http://steverobinson.in/blog/2015/01/21/ruby-2-dot-0-boosts-rails-boot-time/"/>
     <updated>2015-01-21T19:23:54+05:30</updated>
-    <id>http://steverob.github.io/blog/2015/01/21/ruby-2-dot-0-boosts-rails-boot-time</id>
+    <id>http://steverobinson.in/blog/2015/01/21/ruby-2-dot-0-boosts-rails-boot-time</id>
     <content type="html"><![CDATA[<p>I&rsquo;ve been working on a codebase which is Rails 4.0 and Ruby 1.9.3 and something that&rsquo;s annoying about this app is its incredibly large load time. It takes about 26 seconds to boot up.</p>
 
 <p><code>bundle exec rake environment  22.22s user 1.14s system 91% cpu 25.632 total</code></p>
@@ -78,9 +78,9 @@ Freezing strings makes them immutable. This is well explained in this <a href="h
   
   <entry>
     <title type="html"><![CDATA[Hosting FreeGeoIP in Your Cloud]]></title>
-    <link href="http://steverob.github.io/blog/2014/11/30/your-own-geocoding-service/"/>
+    <link href="http://steverobinson.in/blog/2014/11/30/your-own-geocoding-service/"/>
     <updated>2014-11-30T21:11:02+05:30</updated>
-    <id>http://steverob.github.io/blog/2014/11/30/your-own-geocoding-service</id>
+    <id>http://steverobinson.in/blog/2014/11/30/your-own-geocoding-service</id>
     <content type="html"><![CDATA[<p>In the project I&rsquo;m working on where we sell photos, we had to find out the country of each and every visitor for a certain business purpose. So we have this piece of code in the Rails <code>ApplicationController</code> to do the job.</p>
 
 <pre><code class="ruby">def set_country_currency
