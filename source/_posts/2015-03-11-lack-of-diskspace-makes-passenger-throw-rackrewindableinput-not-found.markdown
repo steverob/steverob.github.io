@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Lack of diskspace makes Rack complain RackRewindableInput file not found"
+title: "RackRewindableInput lock file not found"
 date: 2015-03-11 17:05:41 +0530
 comments: true
 categories: ops
