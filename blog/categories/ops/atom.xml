@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ops | Steve Robinson]]></title>
   <link href="http://steverobinson.in/blog/categories/ops/atom.xml" rel="self"/>
   <link href="http://steverobinson.in/"/>
-  <updated>2015-03-29T16:48:48+05:30</updated>
+  <updated>2015-03-29T16:51:04+05:30</updated>
   <id>http://steverobinson.in/</id>
   <author>
     <name><![CDATA[Steve Robinson]]></name>
@@ -14,7 +14,7 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Lack of Diskspace Makes Rack Complain RackRewindableInput File Not Found]]></title>
+    <title type="html"><![CDATA[RackRewindableInput Lock File Not Found]]></title>
     <link href="http://steverobinson.in/blog/2015/03/11/lack-of-diskspace-makes-passenger-throw-rackrewindableinput-not-found/"/>
     <updated>2015-03-11T17:05:41+05:30</updated>
     <id>http://steverobinson.in/blog/2015/03/11/lack-of-diskspace-makes-passenger-throw-rackrewindableinput-not-found</id>
