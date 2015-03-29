@@ -9,7 +9,8 @@
   <meta name="author" content="Steve Robinson">
 
   
-  <meta name="description" content="We were doing some crazy things with our staging server and it ran out of space which we did not notice because of the lack of monitoring on this &hellip;">
+  <meta name="description" content="
+">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -71,6 +72,42 @@
       
   <header>
     
+      <h1 class="entry-title"><a href="/blog/2015/03/29/mounting-an-s3-bucket/">Mounting an S3 Bucket</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-03-29T16:52:23+05:30" pubdate data-updated="true">Mar 29<sup>th</sup>, 2015</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
       <h1 class="entry-title"><a href="/blog/2015/03/11/lack-of-diskspace-makes-passenger-throw-rackrewindableinput-not-found/">RackRewindableInput Lock File Not Found</a></h1>
     
     
@@ -98,19 +135,12 @@
 
 <p>The exception tracker we are using sent us the stacktrace and the error message was incredibly puzzling - <code>Errno::ENOENT: No such file or directory /tmp/RackRewindableInput20150311-13259-cvqkcr.lock)</code>. I was not sure what to make of this and I had no idea that we had ran out of space.</p>
 
-<p>Using the stacktrace I figured out that the exception was thrown from a class - <code>RewindableInput</code> in the Passenger project. There was note saying this was a modified version of <code>Rack::RewindableInput</code>. So this is actually a part of the Rack codebase as well.</p>
-
-<p>After doing some research I learned that this RewindableInput class is used to make a the request body <code>rewindable</code> which apparently means that you can bring it back to the original state whenever you want to (if I understand correctly).</p>
-
-<p>The exception was thrown at <a href="https://github.com/phusion/passenger/blob/stable-3.0/lib/phusion_passenger/utils/rewindable_input.rb#L86">this line</a> where a <code>tempfile</code> is being created and since we did not have any space on the disk this could not happen and thus we got the error.</p>
-
-<p>Even then, since the error message was <code>Errno::ENOENT: No such file or directory</code> and me being not aware of how <a href="https://www.omniref.com/ruby/2.2.1/symbols/Tempfile">Tempfile</a> works could not figure out that the reason was the diskspace. Then I ran into a StackOverflow answer where the OP had reported a similar problem with JRuby and the reccomended solution was the check if the <code>/tmp</code> directory is writable and has proper permissions. But the OP later reported that he had actually ran out of space.</p>
-
-<p>Why did I not think of that? Anyway, I then ran <code>df</code> and found out the disk had no space left. I immediately cleared the junk that was created because of the <strong>crazy stuff</strong> I had been doing earlier and everything went back to normal.</p>
-
-<p>So! If you ever come across this exception - <code>Errno::ENOENT: No such file or directory /tmp/RackRewindableInput&lt;timestamp&gt;-&lt;random&gt;.lock)</code> check your disk space first! :)</p>
 </div>
   
+  
+    <footer>
+      <a rel="full-article" href="/blog/2015/03/11/lack-of-diskspace-makes-passenger-throw-rackrewindableinput-not-found/">Read on &rarr;</a>
+    </footer>
   
 
 
@@ -181,50 +211,12 @@ While googling for ways to debug the boot time I came across this really cool ge
 I double checked my initializers to make sure there&rsquo;s nothing that could slow down the loading and there was none.
 So is Ruby&rsquo;s <code>require</code> slow?</p>
 
-<p>To find out I did some digging and ended up at this <a href="https://bugs.ruby-lang.org/issues/7158">bug report</a> which talks about improvements to Ruby&rsquo;s <code>require</code> method.
-It seems when requiring a file Ruby iterates through the <code>$LOAD_PATHS</code> array to see if the file is loaded which is extremely ineffecient if there are many files to load.
-The patch made uses a hash to maintain the loaded files so that it can be looked up in O(1) time.
-This is explained by Xavier Shay <a href="http://rhnh.net/2011/05/28/speeding-up-rails-startup-time">here</a>.</p>
-
-<p>In addition to this the string objects in the arrays <code>$LOAD_PATHS</code> and <code>$LOADED_FEATURES</code> are also frozen so these can be cached.
-Freezing strings makes them immutable. This is well explained in this <a href="http://magazine.rubyist.net/?Ruby200SpecialEn-require">other article</a> by <a href="https://twitter.com/taru">Masaya Tarui</a>, author of the patch.</p>
-
-<p>All this has made Ruby 2.0 require files much faster. I temporarily switched to Ruby 2.2 and take a look at this -
-<code>bundle exec rake environment  3.95s user 0.85s system 99% cpu 4.822 total</code>.</p>
-
-<p>Bumbler report:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>102.74  countries
-</span><span class='line'>103.72  haml-rails
-</span><span class='line'>117.40  devise
-</span><span class='line'>122.33  foundation-rails
-</span><span class='line'>130.76  newrelic_rpm
-</span><span class='line'>132.80  pry-rails
-</span><span class='line'>144.39  sass-rails
-</span><span class='line'>163.59  activemerchant
-</span><span class='line'>169.82  rails
-</span><span class='line'>195.35  axlsx
-</span><span class='line'>261.47  geocoder
-</span><span class='line'>632.77  fog
-</span><span class='line'>780.72  carrierwave</span></code></pre></td></tr></table></div></figure>
-
-
-<p>That&rsquo;s a whopping 81% improvement over Ruby 1.9.3 in my case. Your mileage may vary. But this is amazing. So as soon as I get the chance I am going to upgrade to Ruby 2.2 :)</p>
 </div>
   
+  
+    <footer>
+      <a rel="full-article" href="/blog/2015/01/21/ruby-2-dot-0-boosts-rails-boot-time/">Read on &rarr;</a>
+    </footer>
   
 
 
@@ -431,6 +423,10 @@ Freezing strings makes them immutable. This is well explained in this <a href="h
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/03/29/mounting-an-s3-bucket/">Mounting an S3 Bucket</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/03/11/lack-of-diskspace-makes-passenger-throw-rackrewindableinput-not-found/">RackRewindableInput Lock File Not Found</a>
       </li>
     
@@ -444,10 +440,6 @@ Freezing strings makes them immutable. This is well explained in this <a href="h
     
       <li class="post">
         <a href="/blog/2014/10/31/outsourcing-image-processing/">Outsourcing Image Processing</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/09/23/on-foundations-validation-and-my-pull-request/">On Foundation&#8217;s Validation &amp; My Pull Request</a>
       </li>
     
   </ul>

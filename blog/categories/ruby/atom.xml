@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ruby | Steve Robinson]]></title>
   <link href="http://steverobinson.in/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://steverobinson.in/"/>
-  <updated>2015-03-29T16:51:04+05:30</updated>
+  <updated>2015-03-29T16:54:16+05:30</updated>
   <id>http://steverobinson.in/</id>
   <author>
     <name><![CDATA[Steve Robinson]]></name>
@@ -43,6 +43,9 @@ While googling for ways to debug the boot time I came across this really cool ge
 <p>Its amazing that it takes 3 seconds to load carrierwave.
 I double checked my initializers to make sure there&rsquo;s nothing that could slow down the loading and there was none.
 So is Ruby&rsquo;s <code>require</code> slow?</p>
+
+<!--more-->
+
 
 <p>To find out I did some digging and ended up at this <a href="https://bugs.ruby-lang.org/issues/7158">bug report</a> which talks about improvements to Ruby&rsquo;s <code>require</code> method.
 It seems when requiring a file Ruby iterates through the <code>$LOAD_PATHS</code> array to see if the file is loaded which is extremely ineffecient if there are many files to load.

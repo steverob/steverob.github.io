@@ -95,6 +95,9 @@
 
 <p>The exception tracker we are using sent us the stacktrace and the error message was incredibly puzzling - <code>Errno::ENOENT: No such file or directory /tmp/RackRewindableInput20150311-13259-cvqkcr.lock)</code>. I was not sure what to make of this and I had no idea that we had ran out of space.</p>
 
+<!--more-->
+
+
 <p>Using the stacktrace I figured out that the exception was thrown from a class - <code>RewindableInput</code> in the Passenger project. There was note saying this was a modified version of <code>Rack::RewindableInput</code>. So this is actually a part of the Rack codebase as well.</p>
 
 <p>After doing some research I learned that this RewindableInput class is used to make a the request body <code>rewindable</code> which apparently means that you can bring it back to the original state whenever you want to (if I understand correctly).</p>
@@ -154,6 +157,8 @@
         <a class="basic-alignment left" href="/blog/2015/01/21/ruby-2-dot-0-boosts-rails-boot-time/" title="Previous Post: Ruby 2.0 boosts Rails boot time">&laquo; Ruby 2.0 boosts Rails boot time</a>
       
       
+        <a class="basic-alignment right" href="/blog/2015/03/29/mounting-an-s3-bucket/" title="Next Post: mounting an S3 bucket">mounting an S3 bucket &raquo;</a>
+      
     </p>
   </footer>
 </article>
@@ -165,6 +170,10 @@
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/03/29/mounting-an-s3-bucket/">Mounting an S3 Bucket</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2015/03/11/lack-of-diskspace-makes-passenger-throw-rackrewindableinput-not-found/">RackRewindableInput Lock File Not Found</a>
@@ -180,10 +189,6 @@
     
       <li class="post">
         <a href="/blog/2014/10/31/outsourcing-image-processing/">Outsourcing Image Processing</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/09/23/on-foundations-validation-and-my-pull-request/">On Foundation's Validation &amp; My Pull Request</a>
       </li>
     
   </ul>

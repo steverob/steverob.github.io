@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ops | Steve Robinson]]></title>
   <link href="http://steverobinson.in/blog/categories/ops/atom.xml" rel="self"/>
   <link href="http://steverobinson.in/"/>
-  <updated>2015-03-29T16:51:04+05:30</updated>
+  <updated>2015-03-29T16:54:16+05:30</updated>
   <id>http://steverobinson.in/</id>
   <author>
     <name><![CDATA[Steve Robinson]]></name>
@@ -21,6 +21,9 @@
     <content type="html"><![CDATA[<p>We were doing some crazy things with our staging server and it ran out of space which we did not notice because of the lack of monitoring on this instance. When our Q/A tried accessing the server later on the app was inaccessible and was throwing 500s all over.</p>
 
 <p>The exception tracker we are using sent us the stacktrace and the error message was incredibly puzzling - <code>Errno::ENOENT: No such file or directory /tmp/RackRewindableInput20150311-13259-cvqkcr.lock)</code>. I was not sure what to make of this and I had no idea that we had ran out of space.</p>
+
+<!--more-->
+
 
 <p>Using the stacktrace I figured out that the exception was thrown from a class - <code>RewindableInput</code> in the Passenger project. There was note saying this was a modified version of <code>Rack::RewindableInput</code>. So this is actually a part of the Rack codebase as well.</p>
 

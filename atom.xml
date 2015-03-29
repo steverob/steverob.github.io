@@ -4,7 +4,7 @@
   <title><![CDATA[Steve Robinson]]></title>
   <link href="http://steverobinson.in/atom.xml" rel="self"/>
   <link href="http://steverobinson.in/"/>
-  <updated>2015-03-29T16:51:04+05:30</updated>
+  <updated>2015-03-29T16:54:16+05:30</updated>
   <id>http://steverobinson.in/</id>
   <author>
     <name><![CDATA[Steve Robinson]]></name>
@@ -14,6 +14,15 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Mounting an S3 Bucket]]></title>
+    <link href="http://steverobinson.in/blog/2015/03/29/mounting-an-s3-bucket/"/>
+    <updated>2015-03-29T16:52:23+05:30</updated>
+    <id>http://steverobinson.in/blog/2015/03/29/mounting-an-s3-bucket</id>
+    <content type="html"><![CDATA[
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[RackRewindableInput Lock File Not Found]]></title>
     <link href="http://steverobinson.in/blog/2015/03/11/lack-of-diskspace-makes-passenger-throw-rackrewindableinput-not-found/"/>
     <updated>2015-03-11T17:05:41+05:30</updated>
@@ -21,6 +30,9 @@
     <content type="html"><![CDATA[<p>We were doing some crazy things with our staging server and it ran out of space which we did not notice because of the lack of monitoring on this instance. When our Q/A tried accessing the server later on the app was inaccessible and was throwing 500s all over.</p>
 
 <p>The exception tracker we are using sent us the stacktrace and the error message was incredibly puzzling - <code>Errno::ENOENT: No such file or directory /tmp/RackRewindableInput20150311-13259-cvqkcr.lock)</code>. I was not sure what to make of this and I had no idea that we had ran out of space.</p>
+
+<!--more-->
+
 
 <p>Using the stacktrace I figured out that the exception was thrown from a class - <code>RewindableInput</code> in the Passenger project. There was note saying this was a modified version of <code>Rack::RewindableInput</code>. So this is actually a part of the Rack codebase as well.</p>
 
@@ -77,6 +89,9 @@ While googling for ways to debug the boot time I came across this really cool ge
 <p>Its amazing that it takes 3 seconds to load carrierwave.
 I double checked my initializers to make sure there&rsquo;s nothing that could slow down the loading and there was none.
 So is Ruby&rsquo;s <code>require</code> slow?</p>
+
+<!--more-->
+
 
 <p>To find out I did some digging and ended up at this <a href="https://bugs.ruby-lang.org/issues/7158">bug report</a> which talks about improvements to Ruby&rsquo;s <code>require</code> method.
 It seems when requiring a file Ruby iterates through the <code>$LOAD_PATHS</code> array to see if the file is loaded which is extremely ineffecient if there are many files to load.
