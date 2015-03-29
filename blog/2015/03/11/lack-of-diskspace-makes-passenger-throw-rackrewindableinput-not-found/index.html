@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>A Fresh Start - Steve Robinson</title>
+  <title>Lack of Diskspace Makes Rack Complain RackRewindableInput File Not Found - Steve Robinson</title>
   <meta name="author" content="Steve Robinson">
 
   
-  <meta name="description" content="Its my birthday and I&rsquo;m turning 23 today. I&rsquo;ve been meaning to start a new blog (old one here) for a while now and I&rsquo;ve finally &hellip;">
+  <meta name="description" content="We were doing some crazy things with our staging server and it ran out of space which we did not notice because of the lack of monitoring on this &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://steverobinson.in/blog/2014/08/10/a-fresh-start">
+  <link rel="canonical" href="http://steverobinson.in/blog/2015/03/11/lack-of-diskspace-makes-passenger-throw-rackrewindableinput-not-found">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Steve Robinson" type="application/atom+xml">
@@ -68,7 +68,7 @@
   
   <header>
     
-      <h1 class="entry-title">A Fresh Start</h1>
+      <h1 class="entry-title">Lack of Diskspace Makes Rack Complain RackRewindableInput File Not Found</h1>
     
     
       <p class="meta">
@@ -84,20 +84,28 @@
   
 
 
-<time datetime="2014-08-10T11:04:08+05:30" pubdate data-updated="true">Aug 10<sup>th</sup>, 2014</time>
+<time datetime="2015-03-11T17:05:41+05:30" pubdate data-updated="true">Mar 11<sup>th</sup>, 2015</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>Its my birthday and I&rsquo;m turning 23 today. I&rsquo;ve been meaning to start a new blog (old one <a href="http://footyntech.wordpress.com">here</a>) for a while now and I&rsquo;ve finally taken that step today. I love blogging and I encourage people around me to do it but then for several months, interestingly right after I feel in love with Ruby and Rails I&rsquo;ve stopped writing completely. I do not know why that happened but it just happened. I wrote these <em>come back posts</em> whenever I felt inspired to write something and I promised I would resume blogging but I never did. And I really don&rsquo;t know if this new blog would be any different. But I hope it is.</p>
+<div class="entry-content"><p>We were doing some crazy things with our staging server and it ran out of space which we did not notice because of the lack of monitoring on this instance. When our Q/A tried accessing the server later on the app was inaccessible and was throwing 500s all over.</p>
 
-<p>Alright why am I starting a new blog? Well, I don&rsquo;t have a proper reason for that. Its like I just don&rsquo;t feel like writing anymore over there in my old blog. Whenever I go through the old stuff I wrote, for some reason, I feel it just does not reflect who I am now. Maybe it did when I wrote them but now I think I&rsquo;ve changed a lot. So I want to start afresh with this new blog.</p>
+<p>The exception tracker we are using sent us the stacktrace and the error message was incredibly puzzling - <code>Errno::ENOENT: No such file or directory /tmp/RackRewindableInput20150311-13259-cvqkcr.lock)</code>. I was not sure what to make of this and I had no idea that we had ran out of space.</p>
 
-<p>I&rsquo;m Steve Robinson and I work as a technical consultant at <a href="http://sprite.com">Spritle Software</a>. I write code for a living and I write code as a hobby. Apart from software I&rsquo;m interested in football (not hand-egg), humanitarian causes, politics, aviation and computer science. I have a pet GSD and his name is <a href="http://instagram.com/p/ifq033MjsP">Jim</a> and like most programmers I know, I absolutely love coffee! I&rsquo;m a Protestant Christian and I live in a medium sized dusty town called Avadi near Chennai. This is my life :)</p>
+<p>Using the stacktrace I figured out that the exception was thrown from a class - <code>RewindableInput</code> in the Passenger project. There was note saying this was a modified version of <code>Rack::RewindableInput</code>. So this is actually a part of the Rack codebase as well.</p>
 
-<p>Oh and this blog is statically generated using <a href="http://octopress.org/">Octopress</a>.</p>
+<p>After doing some research I learned that this RewindableInput class is used to make a the request body <code>rewindable</code> which apparently means that you can bring it back to the original state whenever you want to (if I understand correctly).</p>
+
+<p>The exception was thrown at <a href="https://github.com/phusion/passenger/blob/stable-3.0/lib/phusion_passenger/utils/rewindable_input.rb#L86">this line</a> where a <code>tempfile</code> is being created and since we did not have any space on the disk this could not happen and thus we got the error.</p>
+
+<p>Even then, since the error message was <code>Errno::ENOENT: No such file or directory</code> and me being not aware of how <a href="https://www.omniref.com/ruby/2.2.1/symbols/Tempfile">Tempfile</a> works could not figure out that the reason was the diskspace. Then I ran into a StackOverflow answer where the OP had reported a similar problem with JRuby and the reccomended solution was the check if the <code>/tmp</code> directory is writable and has proper permissions. But the OP later reported that he had actually ran out of space.</p>
+
+<p>Why did I not think of that? Anyway, I then ran <code>df</code> and found out the disk had no space left. I immediately cleared the junk that was created because of the <strong>crazy stuff</strong> I had been doing earlier and everything went back to normal.</p>
+
+<p>So! If you ever come across this exception - <code>Errno::ENOENT: No such file or directory /tmp/RackRewindableInput&lt;timestamp&gt;-&lt;random&gt;.lock)</code> check your disk space first! :)</p>
 </div>
 
 
@@ -120,12 +128,12 @@
   
 
 
-<time datetime="2014-08-10T11:04:08+05:30" pubdate data-updated="true">Aug 10<sup>th</sup>, 2014</time>
+<time datetime="2015-03-11T17:05:41+05:30" pubdate data-updated="true">Mar 11<sup>th</sup>, 2015</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/general/'>general</a>
+    <a class='category' href='/blog/categories/ops/'>ops</a>
   
 </span>
 
@@ -134,7 +142,7 @@
     
       <div class="sharing">
   
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://steverobinson.in/blog/2014/08/10/a-fresh-start/" data-via="stev4nity" data-counturl="http://steverobinson.in/blog/2014/08/10/a-fresh-start/" >Tweet</a>
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://steverobinson.in/blog/2015/03/11/lack-of-diskspace-makes-passenger-throw-rackrewindableinput-not-found/" data-via="stev4nity" data-counturl="http://steverobinson.in/blog/2015/03/11/lack-of-diskspace-makes-passenger-throw-rackrewindableinput-not-found/" >Tweet</a>
   
   
   
@@ -143,8 +151,8 @@
     
     <p class="meta">
       
+        <a class="basic-alignment left" href="/blog/2015/01/21/ruby-2-dot-0-boosts-rails-boot-time/" title="Previous Post: Ruby 2.0 boosts Rails boot time">&laquo; Ruby 2.0 boosts Rails boot time</a>
       
-        <a class="basic-alignment right" href="/blog/2014/09/23/on-foundations-validation-and-my-pull-request/" title="Next Post: On Foundation's validation &amp; my Pull Request">On Foundation's validation &amp; my Pull Request &raquo;</a>
       
     </p>
   </footer>
