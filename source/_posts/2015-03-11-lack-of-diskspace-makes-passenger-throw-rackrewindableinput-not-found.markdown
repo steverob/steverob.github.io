@@ -9,7 +9,7 @@ categories: ops
 We were doing some crazy things with our staging server and it ran out of space which we did not notice because of the lack of monitoring on this instance. When our Q/A tried accessing the server later on the app was inaccessible and was throwing 500s all over.
 
 The exception tracker we are using sent us the stacktrace and the error message was incredibly puzzling - `Errno::ENOENT: No such file or directory /tmp/RackRewindableInput20150311-13259-cvqkcr.lock)`. I was not sure what to make of this and I had no idea that we had ran out of space.
-
+<!--more-->
 Using the stacktrace I figured out that the exception was thrown from a class - `RewindableInput` in the Passenger project. There was note saying this was a modified version of `Rack::RewindableInput`. So this is actually a part of the Rack codebase as well.
 
 After doing some research I learned that this RewindableInput class is used to make a the request body `rewindable` which apparently means that you can bring it back to the original state whenever you want to (if I understand correctly).

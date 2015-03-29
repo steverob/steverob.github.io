@@ -33,7 +33,7 @@ These are some of the gems that were taking lots of time to load.
 Its amazing that it takes 3 seconds to load carrierwave. 
 I double checked my initializers to make sure there's nothing that could slow down the loading and there was none. 
 So is Ruby's `require` slow?
-
+<!--more-->
 To find out I did some digging and ended up at this [bug report](https://bugs.ruby-lang.org/issues/7158) which talks about improvements to Ruby's `require` method.
 It seems when requiring a file Ruby iterates through the `$LOAD_PATHS` array to see if the file is loaded which is extremely ineffecient if there are many files to load. 
 The patch made uses a hash to maintain the loaded files so that it can be looked up in O(1) time.
