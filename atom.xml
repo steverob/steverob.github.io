@@ -4,7 +4,7 @@
   <title><![CDATA[Steve Robinson]]></title>
   <link href="http://steverobinson.in/atom.xml" rel="self"/>
   <link href="http://steverobinson.in/"/>
-  <updated>2015-03-29T16:55:04+05:30</updated>
+  <updated>2015-03-29T18:59:43+05:30</updated>
   <id>http://steverobinson.in/</id>
   <author>
     <name><![CDATA[Steve Robinson]]></name>
@@ -12,6 +12,15 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Mounting an S3 Bucket]]></title>
+    <link href="http://steverobinson.in/blog/2015/03/29/mounting-an-s3-bucket/"/>
+    <updated>2015-03-29T16:52:23+05:30</updated>
+    <id>http://steverobinson.in/blog/2015/03/29/mounting-an-s3-bucket</id>
+    <content type="html"><![CDATA[
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[RackRewindableInput Lock File Not Found]]></title>
