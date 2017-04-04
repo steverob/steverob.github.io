@@ -1,0 +1,50 @@
+# Build settings
+permalink   : /blog/:year/:title/
+markdown    : kramdown
+highlighter : pygments
+gems: [jekyll-paginate]
+
+paginate: 3
+paginate_path: "/blog/page/:num/"
+comments: true
+
+source: source
+destination: _site
+sass:
+  sass_dir: _scss
+  style: compressed # expanded
+
+# SEO settings
+title: Steve Robinson
+description: "Developer working with Ruby, Rails, JavaScript, Angular, Golang and Rust"
+keywords: "developer, chennai, freelance, ruby, rails, angular, javascript"
+url: http://steverob.xyz
+baseurl: ""
+
+google_analytics: UA-61293469-1
+repo: https://github.com/steverob/steverob.github.io
+
+# Author settings
+author:
+  name      : Steve Robinson
+  job       : Full-Stack Engineer
+  bio       : "I love to design and write code. Mostly Ruby on Rails, trying Rust, Go & Clojure on the side. Hit me up if you wanna talk code!"
+  thumb     : /images/author.jpg
+  email     : steve.rob@me.com
+  url       : http://steverob.xyz
+  github    : https://github.com/steverob
+  twitter   : https://twitter.com/stev4nity
+  linkedin  : https://www.linkedin.com/in/steverob/
+
+# navbar pages
+navbar:
+  - slug: about
+    title: About
+  # - slug: resume
+  #   title: Resume
+  # - slug: skills
+  #   title: Skills
+  - slug: blog
+    title: Blog
+
+exclude: ["gulp", "node_modules", "bower", "bower_components", "config.rb", "src", "Gemfile", "Gemfile.lock", ".rvmrc", ".rbenv-version", "package.json", "gulpfile.js", "README.md", "Rakefile", "changelog.md"]
