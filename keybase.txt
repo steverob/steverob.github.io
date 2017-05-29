@@ -1,0 +1,68 @@
+==================================================================
+https://keybase.io/steverobinson
+--------------------------------------------------------------------
+
+I hereby claim:
+
+  * I am an admin of http://steverob.xyz
+  * I am steverobinson (https://keybase.io/steverobinson) on keybase.
+  * I have a public key with fingerprint 060B 9C31 A0B2 EF01 CE12  4F80 937D 327A 9EE3 EF89
+
+To do so, I am signing this object:
+
+{
+    "body": {
+        "key": {
+            "eldest_kid": "01016efd6b92018261b1929a20aa41d9a1540e2ab7fc7b6da05e9e7c4e9a87c1ba0b0a",
+            "fingerprint": "060b9c31a0b2ef01ce124f80937d327a9ee3ef89",
+            "host": "keybase.io",
+            "key_id": "937d327a9ee3ef89",
+            "kid": "01016efd6b92018261b1929a20aa41d9a1540e2ab7fc7b6da05e9e7c4e9a87c1ba0b0a",
+            "uid": "437d9acc85d9fcf8fde613e739e76019",
+            "username": "steverobinson"
+        },
+        "service": {
+            "hostname": "steverob.xyz",
+            "protocol": "http:"
+        },
+        "type": "web_service_binding",
+        "version": 1
+    },
+    "ctime": 1496044817,
+    "expire_in": 157680000,
+    "prev": "b1ab9fe2464cedfde7b90724f0c215b94e21dff775264c9d1111c1710f03b1f0",
+    "seqno": 5,
+    "tag": "signature"
+}
+
+which yields the signature:
+
+-----BEGIN PGP MESSAGE-----
+Version: Keybase OpenPGP v2.0.71
+Comment: https://keybase.io/crypto
+
+yMIiAnicrVJrSBRRFF57SCo+iiLYcqmB7KHIvbOzM3sXEhQEERXNsAe7LvfO3NHx
+sbPtzPrWX5FGEBSB9MAUkUBbBAkso1DRHiRFZCn+sSjwFZWQmULRHak/0c/On8u9
+53ucc+4Zi99si40aCJ994SguuhH1bOR62HYq9fX2Ro7oSj3naeQq6cZBqxRqmP5K
+TeE8HIAAilRVRIJ4AN28CAlEPMI8wFiACsLQJQDKYyKpskREBQMXRVSSBYqwW5Ih
+wYAAzKVxqhYoo6FgSAuYlqwICJKdkGV5qgIoU8gLqhsgp6Q4eQkjSp1UdSNGLNcN
+i8GKI9ig6ZrO3tjFv1HeP/D/ue7whpzAfBCWZbdLQaqsulWFitBJJSfjiABavmGD
+hgK4mjK0YdIaGtKJFjD0ANecxrFUjSZTa7pWO3/B0uvqG5hAMKSbuqxXsUy5aQY9
+FtGsD1rIWkr8vzX8TFVhs2QERjY0ZuCBDCmbmiUKBSQCQXBDKY2jdUEtRP2ahXBJ
+ohuwsGxoDZMkEBOkUl4QBZkqrB+JICCxTwAyD10ECZSHiqpKkotnCKRAFjKUIFCB
+k0AVcFZXZwI653GxMnGZ1Y9WFsBmOES55tFh7xZbVKwteusma8dssTFJfzavYnmb
+7W5C9HhpR9+TuQeXmiZbVg9M3RluM3zK9NB0dfLY7b3HPq/+tF+7mSea6TmrhX3+
+nLbM0o7O93JBiX1+56FXDxdrk3I7DdfpodbaRxkJCccnmpMy1tJbv/oauf6UyqzC
+rI99UxHfcow3kjix3tC1lvNW7Dz8bm6kPrfnad7Le+szM5OL5/bkH53vuT9rLypZ
+Qkf6mgZOetsrugcD09n55b2FjiV9VkjuX1hJzCQj3So62OOdn7kg5X5/nry2fNkR
+HvLtShnfP1UcGToxm9EWSb7akeqQ/ecfp+24eMU72KvXrX1Yid9tX+4qaI+7lR07
++uObI67rSzb+1JK9b+FN1y8cs0jB
+=ygtb
+-----END PGP MESSAGE-----
+
+And finally, I am proving ownership of this host by posting or
+appending to this document.
+
+View my publicly-auditable identity here: https://keybase.io/steverobinson
+
+==================================================================
